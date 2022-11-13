@@ -2617,6 +2617,10 @@ static void DoCommandLogfile(struct action *act)
 				OutputMsg(0, "log flush timeout set to %ds\n", log_flush);
 			return;
 		}
+		if (args[1] && !(strcmp(*args, "strftime"))) {
+			logfile_strftime = !strcmp(args[1], "on");
+			return;
+		}
 		if (ParseSaveStr(act, &screenlogfile))
 			return;
 		if (fore && fore->w_log)
