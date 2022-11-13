@@ -6,6 +6,7 @@
 #include "window.h"
 
 #ifdef ENABLE_TELNET
+void TelKeepaliveSet(int period);
 int TelOpenAndConnect(Window *);
 int TelIsline(Window *);
 void TelProcessLine(char **, size_t *);

@@ -200,6 +200,9 @@ struct comm comms[RC_LAST + 1] =
   { "stuff",		NEED_LAYER|ARGS_012,		{NULL} },
   { "su",		NEED_DISPLAY|ARGS_012,		{NULL} },
   { "suspend",		NEED_DISPLAY|ARGS_0,		{NULL} },
+#if defined(ENABLE_TELNET)
+  { "telnetkeepalive",		ARGS_1,				{NULL} },
+#endif
   { "term",		ARGS_1,				{NULL} },
   { "termcap",		ARGS_23,			{NULL} },
   { "termcapinfo",	ARGS_23,			{NULL} },

@@ -1054,6 +1054,15 @@ static void DoCommandLog(struct action *act)
 }
 
 
+#ifdef ENABLE_TELNET
+static void DoCommandTelnetKeepalive(struct action *act)
+{
+    int period = 0;
+	if (0 == ParseNum(act, &period))
+        TelKeepaliveSet(period);
+}
+#endif /* ENABLE_TELNET */
+
 static void DoCommandSuspend(struct action *act)
 {
 	(void)act; /* unused */
@@ -4942,6 +4951,11 @@ void DoAction(struct action *act)
 	case RC_SHELLTITLE:
 		DoCommandShelltitle(act);
 		break;
+#ifdef ENABLE_TELNET
+	case RC_TELNETKEEPALIVE:
+		DoCommandTelnetKeepalive(act);
+		break;
+#endif
 	case RC_TERMCAP:
 	case RC_TERMCAPINFO:
 	case RC_TERMINFO:
