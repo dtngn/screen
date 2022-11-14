@@ -67,6 +67,7 @@ extern int queryflag;
 extern char *hardcopydir, *screenlogfile, *logtstamp_string;
 extern int log_flush, logtstamp_on, logtstamp_after;
 extern int loglinetstamp;
+extern int logfile_strftime;
 extern char *VisualBellString;
 extern int VBellWait, MsgWait, MsgMinWait, SilenceWait;
 extern char SockPath[], *SockName;
@@ -2629,6 +2630,11 @@ int key;
 	      log_flush = atoi(args[1]);
 	      if (msgok)
 		OutputMsg(0, "log flush timeout set to %ds\n", log_flush);
+	      break;
+	    }
+	  if (args[1] && !(strcmp(*args, "strftime")))
+	    {
+	      logfile_strftime = !strcmp(args[1], "on");
 	      break;
 	    }
 	  if (ParseSaveStr(act, &screenlogfile))
