@@ -66,6 +66,7 @@ extern int captionalways;
 extern int queryflag;
 extern char *hardcopydir, *screenlogfile, *logtstamp_string;
 extern int log_flush, logtstamp_on, logtstamp_after;
+extern int loglinetstamp;
 extern char *VisualBellString;
 extern int VBellWait, MsgWait, MsgMinWait, SilenceWait;
 extern char SockPath[], *SockName;
@@ -2639,6 +2640,9 @@ int key;
 	    break;
 	}
       OutputMsg(0, "logfile is '%s'", screenlogfile);
+      break;
+    case RC_LOGLINETSTAMP:
+      (void)ParseOnOff(act, &loglinetstamp);
       break;
     case RC_LOGTSTAMP:
       if (!*args || !strcmp(*args, "on") || !strcmp(*args, "off"))
