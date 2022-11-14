@@ -49,6 +49,7 @@ extern char *ShellArgs[];
 extern char *ShellProg;
 extern char screenterm[];
 extern char *screenlogfile;
+int logfile_strftime;
 extern char HostName[];
 extern int TtyMode;
 extern int SilenceWait;
@@ -531,8 +532,15 @@ int bufsize;
   if (!w || !buf)
     return -1;
 
-  strncpy(buf, MakeWinMsg(screenlogfile, w, '%'), bufsize - 1);
-  buf[bufsize - 1] = 0;
+  if (logfile_strftime) {
+    time_t now = time(NULL);
+    struct tm tm;
+    if (!localtime_r(&now, &tm) || !strftime(buf, bufsize, screenlogfile, &tm))
+      return -1;
+  } else {
+    strncpy(buf, MakeWinMsg(screenlogfile, w, '%'), bufsize - 1);
+    buf[bufsize - 1] = 0;
+  }
 
   debug2("DoStartLog: win %d, file %s\n", w->w_number, buf);
 
