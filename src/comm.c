@@ -229,6 +229,7 @@ struct comm comms[RC_LAST + 1] =
 #if defined(UTMPOK) && defined(LOGOUTOK)
   { "login",		NEED_FORE|ARGS_01 },
 #endif
+  { "loglinetstamp",	ARGS_1, },
   { "logtstamp",	ARGS_012 },
 #ifdef MAPKEYS
   { "mapdefault",	NEED_DISPLAY|ARGS_0 },
