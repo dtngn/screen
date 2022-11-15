@@ -313,6 +313,9 @@ struct comm comms[RC_LAST + 1] =
 #ifdef BSDJOBS
   { "suspend",		NEED_DISPLAY|ARGS_0 },
 #endif
+#ifdef BUILTIN_TELNET
+  { "telnetkeepalive",	ARGS_1 },
+#endif
   { "term",		ARGS_1 },
   { "termcap",		ARGS_23 },
   { "termcapinfo",	ARGS_23 },

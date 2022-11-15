@@ -2683,6 +2683,15 @@ int key;
     case RC_SHELLTITLE:
       (void)ParseSaveStr(act, &nwin_default.aka);
       break;
+#ifdef BUILTIN_TELNET
+	case RC_TELNETKEEPALIVE:
+	{
+		int period = 0;
+		if (0 == ParseNum(act, &period))
+			TelKeepaliveSet(period);
+	}
+	break;
+#endif
     case RC_TERMCAP:
     case RC_TERMCAPINFO:
     case RC_TERMINFO:

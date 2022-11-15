@@ -997,6 +997,7 @@ struct win *wp;
   evdeq(&wp->w_writeev);
 #ifdef BUILTIN_TELNET
   evdeq(&wp->w_telconnev);
+  evdeq(&wp->w_telkeepaliveev);
 #endif
   wp->w_readev.fd = wp->w_writeev.fd = -1;
 }

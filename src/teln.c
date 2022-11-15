@@ -40,6 +40,7 @@
 #include "extern.h"
 
 extern struct win *fore;
+extern struct win *windows;
 extern struct layer *flayer;
 extern int visual_bell;
 extern char screenterm[];
@@ -60,6 +61,7 @@ static void TelDosub __P((struct win *));
 #define TC_WILL         251
 #define TC_SB           250
 #define TC_BREAK        243
+#define TC_NOP          241
 #define TC_SE           240
 
 #define TC_S "S  b      swWdDc"
@@ -86,6 +88,56 @@ static unsigned char tn_init[] = {
   TC_IAC, TC_WILL, TO_LFLOW,
 };
 
+static int tn_keepalive = 0;
+
+static void tel_keepalive_fn(struct event *ev, char *data)
+{
+	struct win *p = (struct win *)data;
+
+	if (!p || !tn_keepalive)
+		return;
+
+	if (ev) {
+		unsigned char tel_nop[] = { TC_IAC, TC_NOP };
+		TelReply(p, (char *) tel_nop, sizeof(tel_nop));
+	} else {
+		ev = &p->w_telkeepaliveev;
+		if (ev->queued) {
+			evdeq(ev);
+		} else {
+			ev->type = EV_TIMEOUT;
+			ev->handler = tel_keepalive_fn;
+			ev->data = (char *) p;
+		}
+	}
+
+	SetTimeout(ev, tn_keepalive * 1000);
+	evenq(ev);
+}
+
+/**
+ * Set period (in seconds) to send NOP command to prevent telnet
+ * server from disconnecting.
+ **/
+void TelKeepaliveSet(int period)
+{
+	struct win *p;
+
+	if (period < 0)
+		period = 0;
+
+	tn_keepalive = period;
+
+	for (p = windows; p; p = p->w_next) {
+		if (p->w_type == W_TYPE_TELNET) {
+			if (tn_keepalive)
+				tel_keepalive_fn(NULL, (char *) p);
+			else if (p->w_telkeepaliveev.queued)
+				evdeq(&p->w_telkeepaliveev);
+		}
+	}
+}
+
 static void
 tel_connev_fn(ev, data)
 struct event *ev;
@@ -105,6 +157,7 @@ char *data;
   WriteString(p, "connected.\r\n", 12);
   evdeq(&p->w_telconnev);
   p->w_telstate = 0;
+  tel_keepalive_fn(NULL, (char *) p);
 }
 
 int
@@ -171,8 +224,10 @@ TelOpenAndConnect(struct win *p) {
 				}
 			}
 		}
-		else
+		else {
 			WriteString(p, "connected.\r\n", 12);
+			tel_keepalive_fn(NULL, (char *) p);
+		}
 
 		if (!(p->w_cmdargs[2] && strcmp(p->w_cmdargs[2], TEL_DEFPORT)))
 			TelReply(p, (char *)tn_init, sizeof(tn_init));
@@ -293,6 +348,7 @@ int f;
 	}
     }
   *lenp = p - buf;
+  tel_keepalive_fn(NULL, (char *) fore);
   return trunc;
 }
 

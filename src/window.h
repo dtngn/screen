@@ -284,6 +284,7 @@ struct win
   char   w_telsubbuf[128];
   int    w_telsubidx;
   struct event w_telconnev;
+  struct event w_telkeepaliveev;
 #endif
   struct {
     int    on;    /* Is the alternate buffer currently being used? */

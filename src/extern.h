@@ -465,6 +465,7 @@ extern void  LayProcessMouseSwitch __P((struct layer *, int));
 
 /* teln.c */
 #ifdef BUILTIN_TELNET
+void TelKeepaliveSet(int period);
 extern int   TelOpenAndConnect __P((struct win *));
 extern int   TelIsline __P((struct win *p));
 extern void  TelProcessLine __P((char **, int *));
