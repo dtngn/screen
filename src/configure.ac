@@ -1,5 +1,5 @@
-AC_INIT([GNU Screen], [4.99.0], [https://savannah.gnu.org/bugs/?group=screen], [screen], [https://www.gnu.org/software/screen/])
-AC_PREREQ(2.60)
+AC_INIT([GNU Screen],[4.99.0],[https://savannah.gnu.org/bugs/?group=screen],[screen],[https://www.gnu.org/software/screen/])
+AC_PREREQ([2.71])
 
 AC_CONFIG_HEADERS([config.h])
 
@@ -46,7 +46,7 @@ dnl
 dnl Check for sane compiler
 dnl
 
-AC_GNU_SOURCE
+AC_USE_SYSTEM_EXTENSIONS
 AC_PROG_CC
 AC_PROG_AWK
 AC_PROG_INSTALL
@@ -135,13 +135,12 @@ AS_IF([test "x$enable_pam" = "xyes"], [
 	AC_MSG_CHECKING(for PAM support)
 	oldlibs="$LIBS"
 	LIBS="$LIBS -lpam"
-	AC_TRY_LINK([#include <security/pam_appl.h>], [
+	AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <security/pam_appl.h>]], [[
 		pam_start(0, 0, 0, 0);
 		pam_authenticate(0, 0);
 		pam_end(0,0);
-	], AC_MSG_RESULT(yes);
-	AC_DEFINE(ENABLE_PAM),
-	AC_MSG_ERROR(no);LIBS="$oldlibs")
+	]])],[AC_MSG_RESULT(yes);
+	AC_DEFINE(ENABLE_PAM)],[AC_MSG_ERROR(no);LIBS="$oldlibs"])
 ])
 
 dnl -- enable_utmp
@@ -149,7 +148,7 @@ dnl -- enable_utmp
 AS_IF([test "x$enable_utmp" = "xyes"], [
 	AC_CHECK_HEADERS(utmpx.h, have_utmpx=yes, have_utmpx=no)
 	AS_IF([test "x$have_utmpx" != "xyes"],
-	      AC_ERROR(Missing utmpx.h))
+	      AC_MSG_ERROR(Missing utmpx.h))
 
 	AC_CHECK_HEADER(utempter.h, have_utempter=yes, have_utempter=no)
 	AS_IF([test "x$have_utempter" = "xyes"], [
@@ -158,20 +157,18 @@ AS_IF([test "x$enable_utmp" = "xyes"], [
 	])
 
 	AC_MSG_CHECKING(if utmpx struct has ut_host field)
-	AC_TRY_COMPILE([#include <utmpx.h>], [
+	AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <utmpx.h>]], [[
 		struct utmpx u;
 		u.ut_host[0] = 0;
-	], AC_MSG_RESULT(yes)
-	AC_DEFINE(HAVE_UT_HOST),
-	AC_MSG_RESULT(no))
+	]])],[AC_MSG_RESULT(yes)
+	AC_DEFINE(HAVE_UT_HOST)],[AC_MSG_RESULT(no)])
 
 	AC_MSG_CHECKING(if utmpx struct has ut_exit field)
-	AC_TRY_COMPILE([#include <utmpx.h>], [
+	AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <utmpx.h>]], [[
 		struct utmpx u;
 		u.ut_exit.e_exit;
-	], AC_MSG_RESULT(yes)
-	AC_DEFINE(HAVE_UT_EXIT),
-	AC_MSG_RESULT(no))
+	]])],[AC_MSG_RESULT(yes)
+	AC_DEFINE(HAVE_UT_EXIT)],[AC_MSG_RESULT(no)])
 
 	AC_DEFINE(ENABLE_UTMP)
 ])
@@ -209,7 +206,8 @@ dnl
 dnl Generate files from *.in ones
 dnl
 
-AC_OUTPUT(Makefile doc/Makefile)
+AC_CONFIG_FILES([Makefile doc/Makefile])
+AC_OUTPUT
 
 dnl
 dnl Print out config
