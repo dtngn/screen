@@ -182,7 +182,7 @@ AS_IF([test "x$enable_telnet" = "xyes"], [
 dnl -- enable_socket_dir
 
 AS_IF([test "x$enable_socket_dir" != "xno"], [
-	AS_IF([test "x$enable_socket_dir" == "xyes"],
+	AS_IF([test "x$enable_socket_dir" = "xyes"],
 	      [enable_socket_dir="/run/screen"]
 	)
 	AC_DEFINE_UNQUOTED(SOCKET_DIR, "$enable_socket_dir")
@@ -198,7 +198,7 @@ dnl -- with_pty_group
 AC_DEFINE_UNQUOTED(PTY_GROUP, $with_pty_group)
 
 dnl -- with_pty_rofs
-AS_IF([test "x$with_pty_rofs" == "xyes"], [
+AS_IF([test "x$with_pty_rofs" = "xyes"], [
 	AC_DEFINE(PTY_ROFS)
 ])
 
