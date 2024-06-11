@@ -566,6 +566,8 @@ int main(int argc, char **argv)
 					}
 					if (!*SocketMatch)
 						exit_with_usage(myname, "Empty session-name?", NULL);
+					if (strlen(SocketMatch) > 80)
+						exit_with_usage(myname, "Session-name is too long (max length is 80 symbols)", NULL);
 					break;
 				case 'X':
 					cmdflag = true;
