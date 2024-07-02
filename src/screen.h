@@ -272,6 +272,7 @@ extern bool hastruecolor;
 extern bool iflag;
 extern bool logtstamp_on;
 extern bool loglinetstamp;
+extern bool logfile_strftime;
 extern bool lsflag;
 extern bool quietflag;
 extern bool wipeflag;
