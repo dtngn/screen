@@ -144,8 +144,9 @@ struct event *ev;
 char *data;
 {
   struct win *p = (struct win *)data;
-  if (connect(p->w_ptyfd, (struct sockaddr *)&p->w_telsa, sizeof(p->w_telsa)) && errno != EISCONN)
-    {
+  if (ev) {
+    evdeq(ev);
+    if (connect(p->w_ptyfd, (struct sockaddr *)&p->w_telsa, sizeof(p->w_telsa)) && errno != EISCONN) {
       char buf[1024];
       buf[0] = ' ';
       strncpy(buf + 1, strerror(errno), sizeof(buf) - 2);
@@ -154,10 +155,12 @@ char *data;
       WindowDied(p, 0, 0);
       return;
     }
+  }
   WriteString(p, "connected.\r\n", 12);
-  evdeq(&p->w_telconnev);
   p->w_telstate = 0;
   tel_keepalive_fn(NULL, (char *) p);
+
+  TelReply(p, (char *) tn_init, sizeof(tn_init));
 }
 
 int
@@ -225,12 +228,8 @@ TelOpenAndConnect(struct win *p) {
 			}
 		}
 		else {
-			WriteString(p, "connected.\r\n", 12);
-			tel_keepalive_fn(NULL, (char *) p);
+			tel_connev_fn(NULL, (char *) p);
 		}
-
-		if (!(p->w_cmdargs[2] && strcmp(p->w_cmdargs[2], TEL_DEFPORT)))
-			TelReply(p, (char *)tn_init, sizeof(tn_init));
 
 		p->w_ptyfd = fd;
 		memcpy(&p->w_telsa, &res->ai_addr, sizeof(res->ai_addr));
