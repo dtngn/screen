@@ -373,8 +373,15 @@ int DoStartLog(Window *window, char *buf, int bufsize)
 	if (!window || !buf)
 		return -1;
 
-	strncpy(buf, MakeWinMsg(screenlogfile, window, '%'), bufsize - 1);
-	buf[bufsize - 1] = 0;
+	if (logfile_strftime) {
+		time_t now = time(NULL);
+		struct tm tm;
+		if (!localtime_r(&now, &tm) || !strftime(buf, bufsize, screenlogfile, &tm))
+			return -1;
+	} else {
+		strncpy(buf, MakeWinMsg(screenlogfile, window, '%'), bufsize - 1);
+		buf[bufsize - 1] = 0;
+	}
 
 	if (window->w_log != NULL)
 		logfclose(window->w_log);

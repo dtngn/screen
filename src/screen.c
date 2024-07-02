@@ -122,6 +122,7 @@ bool      logtstamp_on = false;     /* tstamp disabled */
 char     *logtstamp_string;         /* stamp layout */
 int       logtstamp_after = 120;    /* first tstamp after 120s */
 bool      loglinetstamp = false;    /* prepend timestamp on each log line */
+bool      logfile_strftime = false; /* log file name use strftime(3) pattern */
 char     *hardcopydir = NULL;
 char     *BellString;
 char     *VisualBellString;
