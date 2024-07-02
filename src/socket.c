@@ -48,12 +48,10 @@
 
 #if ENABLE_PAM
   #include <security/pam_appl.h>
+#elif ENABLE_SHADOWPW
+  #include <shadow.h>
 #else
-  #ifdef _PWD_H_
-    #include <pwd.h>
-  #else
-    #include <shadow.h>
-  #endif /* PWD_H */
+  #include <pwd.h>
 #endif
 
 #include "screen.h"
@@ -1208,7 +1206,7 @@ static bool CheckPassword(const char *password) {
 	bool ret = false;
 	char *passwd = 0;
 
-#ifndef _PWD_H
+#ifndef ENABLE_SHADOWPW
 	struct passwd *p;
 #else
 	struct spwd *p;
@@ -1220,8 +1218,8 @@ static bool CheckPassword(const char *password) {
 	if (seteuid(0) || setegid(0))
 		Panic(0, "\r\ncan't get root uid/gid\r\n");
 
-#ifndef _PWD_H
-	p = getpwnam_shadow(ppp->pw_name);
+#ifndef ENABLE_SHADOWPW
+	p = getpwnam(ppp->pw_name);
 #else
 	p = getspnam(ppp->pw_name);
 #endif
@@ -1235,7 +1233,7 @@ static bool CheckPassword(const char *password) {
 		AddStr("\r\ncan't open passwd file\r\n");
 		return false;
 	}
-#ifndef _PWD_H
+#ifndef ENABLE_SHADOWPW
 	passwd = crypt(password, p->pw_passwd);
 	ret    = (strcmp(passwd, p->pw_passwd) == 0);
 #else
