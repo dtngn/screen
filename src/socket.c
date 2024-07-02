@@ -48,7 +48,7 @@
 
 #if ENABLE_PAM
 #include <security/pam_appl.h>
-#else
+#elif ENABLE_SHADOWPW
 #include <shadow.h>
 #endif
 
@@ -1192,7 +1192,7 @@ static bool CheckPassword(const char *password) {
 	return ret;
 }
 
-#else /* ENABLE_PAM */
+#elif ENABLE_SHADOWPW /* ENABLE_PAM */
 
 static bool CheckPassword(const char *password) {
 	bool ret = false;
@@ -1218,6 +1218,19 @@ static bool CheckPassword(const char *password) {
 
 	return ret;
 }
+
+#else /* ENABLE_SHADOWPW */
+
+static bool CheckPassword(const char *password) {
+	struct passwd *p = getpwnam(ppp->pw_name);
+	const char *passwd = NULL;
+
+	if (p)
+		passwd = crypt(password, p->pw_passwd);
+
+	return (passwd && !strcmp(passwd, p->pw_passwd));
+}
+
 #endif /* ENABLE_PAM */
 
 static void PasswordProcessInput(char *ibuf, size_t ilen)

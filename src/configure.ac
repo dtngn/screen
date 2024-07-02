@@ -28,6 +28,9 @@ dnl -
 AH_TEMPLATE([ENABLE_PAM], [Enable Pluggable Authentication Modules support])
 
 dnl -
+AH_TEMPLATE([ENABLE_SHADOWPW], [Enable shadow password support])
+
+dnl -
 AH_TEMPLATE([ENABLE_TELNET], [Enable built-in telnet client])
 
 dnl -
@@ -99,6 +102,10 @@ AC_ARG_ENABLE(pam, AS_HELP_STRING([--enable-pam],
 	      [enable PAM support (default: enabled)]),
 	      [enable_pam=$enableval],
 	      [enable_pam=yes])
+AC_ARG_ENABLE(shadow, AS_HELP_STRING([--enable-shadow],
+	      [enable shadow password support if PAM is disabled (default: enabled)]),
+	      [enable_shadow=$enableval],
+	      [enable_shadow=yes])
 AC_ARG_ENABLE(utmp, AS_HELP_STRING([--enable-utmp],
 	      [enable utmp support (default: disabled)]),
 	      [enable_utmp=$enableval],
@@ -141,6 +148,14 @@ AS_IF([test "x$enable_pam" = "xyes"], [
 		pam_end(0,0);
 	]])],[AC_MSG_RESULT(yes);
 	AC_DEFINE(ENABLE_PAM)],[AC_MSG_ERROR(no);LIBS="$oldlibs"])
+],[
+	dnl -- enable_shadow
+	AS_IF([test "x$enable_shadow" = "xyes"], [
+		AC_CHECK_HEADER(shadow.h, have_shadowpw=yes, have_shadowpw=no)
+		AS_IF([test "x$have_shadowpw" = "xyes"],
+			AC_DEFINE(ENABLE_SHADOWPW),
+			AC_MSG_ERROR(Missing shadow.h))
+	])
 ])
 
 dnl -- enable_utmp
