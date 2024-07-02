@@ -314,6 +314,7 @@ struct comm comms[RC_LAST + 1] =
   { "suspend",		NEED_DISPLAY|ARGS_0 },
 #endif
 #ifdef BUILTIN_TELNET
+  { "telnetbinary",		ARGS_01 },
   { "telnetkeepalive",	ARGS_1 },
 #endif
   { "term",		ARGS_1 },

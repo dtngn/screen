@@ -2684,6 +2684,13 @@ int key;
       (void)ParseSaveStr(act, &nwin_default.aka);
       break;
 #ifdef BUILTIN_TELNET
+	case RC_TELNETBINARY:
+	{
+		int binmode = 0;
+		if (0 == ParseSwitch(act, &binmode))
+			TelBinaryModeSet(binmode);
+	}
+	break;
 	case RC_TELNETKEEPALIVE:
 	{
 		int period = 0;

@@ -138,6 +138,28 @@ void TelKeepaliveSet(int period)
 	}
 }
 
+static int tn_binmode = 0;
+
+static void TelBinaryModeUpdate(struct win *p)
+{
+	unsigned char cmd[] = { TC_IAC, TC_WILL, TO_BINARY };
+	cmd[1] = tn_binmode ? TC_WILL : TC_WONT;
+	TelReply(p, (char *) cmd, 3);
+	p->w_telropts[TO_BINARY] = !!tn_binmode;
+}
+
+void TelBinaryModeSet(int binmode)
+{
+	struct win *p;
+
+	tn_binmode = !!binmode;
+
+	for (p = windows; p; p = p->w_next) {
+		if (p->w_type == W_TYPE_TELNET)
+			TelBinaryModeUpdate(p);
+	}
+}
+
 static void
 tel_connev_fn(ev, data)
 struct event *ev;
@@ -161,6 +183,7 @@ char *data;
   tel_keepalive_fn(NULL, (char *) p);
 
   TelReply(p, (char *) tn_init, sizeof(tn_init));
+  TelBinaryModeUpdate(p);
 }
 
 int
