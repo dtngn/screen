@@ -195,6 +195,61 @@ int logfclose(Log *l)
 	return 0;
 }
 
+static void logfwrite_timestamp(FILE *fp)
+{
+	char buf[] = "[0000-00-00 00:00:00.000000]";
+	char *p = buf;
+	struct timespec ts;
+	struct tm tm;
+
+	if (clock_gettime(CLOCK_REALTIME, &ts) || !localtime_r(&ts.tv_sec, &tm))
+		return;
+
+	p += strftime(p, sizeof(buf) - (p - buf), "[%F %T", &tm);
+	p += snprintf(p, sizeof(buf) - (p - buf), ".%06ld]", ts.tv_nsec / 1000);
+
+	fwrite(buf, sizeof(buf) - 1, 1, fp);
+}
+
+static int _logfwrite(FILE *fp, const char *buf, size_t n)
+{
+	static enum {
+		LINE_CONT,
+		LINE_ENDED_NF,
+		LINE_ENDED_CR,
+	} stat = LINE_ENDED_NF;
+	const char *end = buf;
+	int r = 0;
+
+	while (n) {
+		if ((stat == LINE_ENDED_NF)
+				|| (stat == LINE_ENDED_CR && *buf != '\n')) {
+			logfwrite_timestamp(fp);
+			stat = LINE_CONT;
+		}
+
+		/* find the next end-of-line */
+		for (; end < (buf + n) && *end != '\n' && *end != '\r'; end++);
+
+		if (end < (buf + n)) {
+			if (*end == '\n')
+				stat = LINE_ENDED_NF;
+			else if (end < (buf + n - 1) && *(end + 1) == '\n') {
+				end++;
+				stat = LINE_ENDED_NF;
+			} else
+				stat = LINE_ENDED_CR;
+			end++;
+		}
+
+		r += fwrite(buf, end - buf, 1, fp);
+		n -= (end - buf);
+		buf = end;
+	}
+
+	return r;
+}
+
 /*
  * XXX
  * write and flush both *should* check the file's stat, if it disappeared
@@ -206,7 +261,10 @@ int logfwrite(Log *l, char *buf, size_t n)
 
 	if (stolen_logfile(l) && logfile_reopen(l->name, fileno(l->fp), l))
 		return -1;
-	r = fwrite(buf, n, 1, l->fp);
+	if (loglinetstamp)
+		r = _logfwrite(l->fp, buf, n);
+	else
+		r = fwrite(buf, n, 1, l->fp);
 	l->writecount += l->flushcount + 1;
 	l->flushcount = 0;
 	changed_logfile(l);
