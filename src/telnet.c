@@ -88,20 +88,23 @@ static void tel_connev_fn(Event *ev, void *data)
 {
 	Window *win = (Window *)data;
 
-	(void)ev; /* unused */
-
-	if (connect(win->w_ptyfd, (struct sockaddr *)&win->w_telsa, sizeof(struct sockaddr_in)) && errno != EISCONN) {
-		char buf[1024];
-		buf[0] = ' ';
-		strncpy(buf + 1, strerror(errno), ARRAY_SIZE(buf) - 2);
-		buf[ARRAY_SIZE(buf) - 1] = 0;
-		WriteString(win, buf, strlen(buf));
-		WindowDied(win, 0, 0);
-		return;
+	if (ev) {
+		evdeq(ev);
+		if (connect(win->w_ptyfd, (struct sockaddr *)&win->w_telsa, sizeof(struct sockaddr_in)) && errno != EISCONN) {
+			char buf[1024];
+			buf[0] = ' ';
+			strncpy(buf + 1, strerror(errno), ARRAY_SIZE(buf) - 2);
+			buf[ARRAY_SIZE(buf) - 1] = 0;
+			WriteString(win, buf, strlen(buf));
+			WindowDied(win, 0, 0);
+			return;
+		}
 	}
+
 	WriteString(win, "connected.\r\n", 12);
-	evdeq(&win->w_telconnev);
 	win->w_telstate = 0;
+
+	TelReply(win, (char *) tn_init, ARRAY_SIZE(tn_init));
 }
 
 int TelOpenAndConnect(Window *win)
@@ -166,10 +169,7 @@ int TelOpenAndConnect(Window *win)
 				}
 			}
 		} else
-			WriteString(win, "connected.\r\n", 12);
-
-		if (!(win->w_cmdargs[2] && strcmp(win->w_cmdargs[2], TEL_DEFPORT)))
-			TelReply(win, (char *)tn_init, ARRAY_SIZE(tn_init));
+			tel_connev_fn(NULL, win);
 
 		win->w_ptyfd = fd;
 		memmove(&win->w_telsa, &res->ai_addr, sizeof(res->ai_addr));
