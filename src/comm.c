@@ -100,6 +100,7 @@ struct comm comms[RC_LAST + 1] =
   { "defsilence",	ARGS_1,				{NULL} },
   { "defslowpaste",	ARGS_1,				{NULL} },
 #ifdef ENABLE_TELNET
+  { "deftelnetbinary",		ARGS_01,		{NULL} },
   { "deftelnetkeepalive",	ARGS_1,		{NULL} },
 #endif
   { "defutf8",		ARGS_1,				{NULL} },
@@ -204,6 +205,7 @@ struct comm comms[RC_LAST + 1] =
   { "su",		NEED_DISPLAY|ARGS_012,		{NULL} },
   { "suspend",		NEED_DISPLAY|ARGS_0,		{NULL} },
 #if defined(ENABLE_TELNET)
+  { "telnetbinary",		NEED_FORE|ARGS_01,	{NULL} },
   { "telnetkeepalive",	NEED_FORE|ARGS_1,	{NULL} },
 #endif
   { "term",		ARGS_1,				{NULL} },

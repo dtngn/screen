@@ -6,6 +6,8 @@
 #include "window.h"
 
 #ifdef ENABLE_TELNET
+void TelBinaryModeDefaultSet(bool binmode);
+void TelBinaryModeSet(Window *w, bool binmode);
 void TelKeepaliveDefaultSet(unsigned int period);
 void TelKeepaliveSet(Window *w, unsigned int period);
 int TelOpenAndConnect(Window *);
