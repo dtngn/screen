@@ -1053,6 +1053,29 @@ static void DoCommandLog(struct action *act)
 		LogToggle(b);
 }
 
+#ifdef ENABLE_TELNET
+static void DoCommandDefTelnetKeepalive(struct action *act)
+{
+	int period = 0;
+	if (0 == ParseNum(act, &period)) {
+		if (period < 0)
+			period = 0;
+		TelKeepaliveDefaultSet(period);
+	}
+}
+
+static void DoCommandTelnetKeepalive(struct action *act)
+{
+	int period = 0;
+	if (!fore || fore->w_type != W_TYPE_TELNET)
+		return;
+	if (0 == ParseNum(act, &period)) {
+		if (period < 0)
+			period = 0;
+		TelKeepaliveSet(fore, period);
+	}
+}
+#endif /* ENABLE_TELNET */
 
 static void DoCommandSuspend(struct action *act)
 {
@@ -4953,6 +4976,14 @@ void DoAction(struct action *act)
 	case RC_SHELLTITLE:
 		DoCommandShelltitle(act);
 		break;
+#ifdef ENABLE_TELNET
+	case RC_DEFTELNETKEEPALIVE:
+		DoCommandDefTelnetKeepalive(act);
+		break;
+	case RC_TELNETKEEPALIVE:
+		DoCommandTelnetKeepalive(act);
+		break;
+#endif /* ENABLE_TELNET */
 	case RC_TERMCAP:
 	case RC_TERMCAPINFO:
 	case RC_TERMINFO:

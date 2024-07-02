@@ -821,6 +821,7 @@ void CloseDevice(Window *window)
 	evdeq(&window->w_writeev);
 #ifdef ENABLE_TELNET
 	evdeq(&window->w_telconnev);
+	evdeq(&window->w_telkeepaliveev);
 #endif
 	window->w_readev.fd = window->w_writeev.fd = -1;
 }

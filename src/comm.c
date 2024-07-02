@@ -100,6 +100,9 @@ struct comm comms[RC_LAST + 1] =
   { "defshell",		ARGS_1,				{NULL} },
   { "defsilence",	ARGS_1,				{NULL} },
   { "defslowpaste",	ARGS_1,				{NULL} },
+#ifdef ENABLE_TELNET
+  { "deftelnetkeepalive",	ARGS_1,		{NULL} },
+#endif
   { "defutf8",		ARGS_1,				{NULL} },
   { "defwrap",		ARGS_1,				{NULL} },
   { "defwritelock",	ARGS_1,				{NULL} },
@@ -201,6 +204,9 @@ struct comm comms[RC_LAST + 1] =
   { "stuff",		NEED_LAYER|ARGS_012,		{NULL} },
   { "su",		NEED_DISPLAY|ARGS_012,		{NULL} },
   { "suspend",		NEED_DISPLAY|ARGS_0,		{NULL} },
+#if defined(ENABLE_TELNET)
+  { "telnetkeepalive",	NEED_FORE|ARGS_1,	{NULL} },
+#endif
   { "term",		ARGS_1,				{NULL} },
   { "termcap",		ARGS_23,			{NULL} },
   { "termcapinfo",	ARGS_23,			{NULL} },

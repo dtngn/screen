@@ -59,6 +59,7 @@ static void TelDosub(Window *);
 #define TC_WILL         251
 #define TC_SB           250
 #define TC_BREAK        243
+#define TC_NOP          241
 #define TC_SE           240
 
 #define TC_S "S  b      swWdDc"
@@ -84,6 +85,52 @@ static unsigned char tn_init[] = {
 	TC_IAC, TC_WILL, TO_LFLOW,
 };
 
+static unsigned int tn_keepalive = 0;
+
+static void tel_keepalive_fn(Event *ev, void *data)
+{
+    Window *win = (Window *)data;
+
+    if (!win || win->w_type != W_TYPE_TELNET || !win->w_telkeepaliveev_period)
+        return;
+
+    if (ev) {
+        unsigned char tel_nop[] = { TC_IAC, TC_NOP };
+        TelReply(win, (char *) tel_nop, ARRAY_SIZE(tel_nop));
+    } else {
+        ev = &win->w_telkeepaliveev;
+        if (ev->queued) {
+            evdeq(ev);
+        } else {
+            ev->type = EV_TIMEOUT;
+            ev->handler = tel_keepalive_fn;
+            ev->data = win;
+        }
+    }
+
+    SetTimeout(ev, win->w_telkeepaliveev_period * 1000);
+    evenq(ev);
+}
+
+/**
+ * Set period (in seconds) to send NOP command to prevent telnet
+ * server from disconnecting.
+ **/
+void TelKeepaliveSet(Window *w, unsigned int period)
+{
+	if (w->w_type != W_TYPE_TELNET)
+		return;
+	w->w_telkeepaliveev_period = period;
+	if (period)
+		tel_keepalive_fn(NULL, w);
+	else if (w->w_telkeepaliveev.queued)
+		evdeq(&w->w_telkeepaliveev);
+}
+
+void TelKeepaliveDefaultSet(unsigned int period) {
+	tn_keepalive = period;
+}
+
 static void tel_connev_fn(Event *ev, void *data)
 {
 	Window *win = (Window *)data;
@@ -105,6 +152,8 @@ static void tel_connev_fn(Event *ev, void *data)
 	win->w_telstate = 0;
 
 	TelReply(win, (char *) tn_init, ARRAY_SIZE(tn_init));
+
+	TelKeepaliveSet(win, tn_keepalive);
 }
 
 int TelOpenAndConnect(Window *win)
@@ -267,6 +316,7 @@ int DoTelnet(char *buf, size_t *lenp, int f)
 		}
 	}
 	*lenp = p - buf;
+	tel_keepalive_fn(NULL, fore);
 	return trunc;
 }
 
