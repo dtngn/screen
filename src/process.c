@@ -1053,6 +1053,10 @@ static void DoCommandLog(struct action *act)
 		LogToggle(b);
 }
 
+static void DoCommandLoglinetstamp(struct action *act)
+{
+	(void)ParseOnOff(act, &loglinetstamp);
+}
 
 static void DoCommandSuspend(struct action *act)
 {
@@ -4946,6 +4950,9 @@ void DoAction(struct action *act)
 		break;
 	case RC_LOGFILE:
 		DoCommandLogfile(act);
+		break;
+	case RC_LOGLINETSTAMP:
+		DoCommandLoglinetstamp(act);
 		break;
 	case RC_LOGTSTAMP:
 		DoCommandLogtstamp(act);

@@ -142,6 +142,7 @@ struct comm comms[RC_LAST + 1] =
 #if defined(ENABLE_UTMP)
   { "login",		NEED_FORE|ARGS_01,		{NULL} },
 #endif
+  { "loglinetstamp",	ARGS_1,			{NULL} },
   { "logtstamp",	ARGS_012,			{NULL} },
   { "mapdefault",	NEED_DISPLAY|ARGS_0,		{NULL} },
   { "mapnotnext",	NEED_DISPLAY|ARGS_0,		{NULL} },

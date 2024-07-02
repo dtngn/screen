@@ -121,6 +121,7 @@ int       log_flush = 10;           /* flush interval in seconds */
 bool      logtstamp_on = false;     /* tstamp disabled */
 char     *logtstamp_string;         /* stamp layout */
 int       logtstamp_after = 120;    /* first tstamp after 120s */
+bool      loglinetstamp = false;    /* prepend timestamp on each log line */
 char     *hardcopydir = NULL;
 char     *BellString;
 char     *VisualBellString;

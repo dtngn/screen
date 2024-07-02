@@ -272,6 +272,7 @@ extern bool do_auth;
 extern bool hastruecolor;
 extern bool iflag;
 extern bool logtstamp_on;
+extern bool loglinetstamp;
 extern bool lsflag;
 extern bool quietflag;
 extern bool wipeflag;
