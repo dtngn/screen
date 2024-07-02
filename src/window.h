@@ -261,6 +261,8 @@ struct Window {
 	char   w_telsubbuf[128];
 	int    w_telsubidx;
 	Event w_telconnev;
+	Event w_telkeepaliveev;
+	unsigned int w_telkeepaliveev_period;
 #endif
 	struct {
 		int    on;    		/* Is the alternate buffer currently being used? */
