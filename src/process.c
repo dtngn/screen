@@ -1054,6 +1054,22 @@ static void DoCommandLog(struct action *act)
 }
 
 #ifdef ENABLE_TELNET
+static void DoCommandDefTelnetBinary(struct action *act)
+{
+	bool binmode = 0;
+	if (0 == ParseSwitch(act, &binmode))
+		TelBinaryModeDefaultSet(binmode);
+}
+
+static void DoCommandTelnetBinary(struct action *act)
+{
+	bool binmode = 0;
+	if (!fore || fore->w_type != W_TYPE_TELNET)
+		return;
+	if (0 == ParseSwitch(act, &binmode))
+		TelBinaryModeSet(fore, binmode);
+}
+
 static void DoCommandDefTelnetKeepalive(struct action *act)
 {
 	int period = 0;
@@ -4977,6 +4993,12 @@ void DoAction(struct action *act)
 		DoCommandShelltitle(act);
 		break;
 #ifdef ENABLE_TELNET
+	case RC_DEFTELNETBINARY:
+		DoCommandDefTelnetBinary(act);
+		break;
+	case RC_TELNETBINARY:
+		DoCommandTelnetBinary(act);
+		break;
 	case RC_DEFTELNETKEEPALIVE:
 		DoCommandDefTelnetKeepalive(act);
 		break;

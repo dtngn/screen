@@ -131,6 +131,26 @@ void TelKeepaliveDefaultSet(unsigned int period) {
 	tn_keepalive = period;
 }
 
+static bool tn_binmode = 0;
+
+void TelBinaryModeSet(Window *w, bool binmode) {
+	unsigned char cmd[] = { TC_IAC, TC_WILL, TO_BINARY };
+
+	if (w->w_type != W_TYPE_TELNET)
+		return;
+
+	if (w->w_telropts[TO_BINARY] != binmode ) {
+		cmd[1] = binmode ? TC_WILL : TC_WONT;
+		TelReply(w, (char *) cmd, 3);
+	}
+
+	w->w_telropts[TO_BINARY] = binmode;
+}
+
+void TelBinaryModeDefaultSet(bool binmode) {
+	tn_binmode = binmode;
+}
+
 static void tel_connev_fn(Event *ev, void *data)
 {
 	Window *win = (Window *)data;
@@ -154,6 +174,8 @@ static void tel_connev_fn(Event *ev, void *data)
 	TelReply(win, (char *) tn_init, ARRAY_SIZE(tn_init));
 
 	TelKeepaliveSet(win, tn_keepalive);
+
+	TelBinaryModeSet(win, tn_binmode);
 }
 
 int TelOpenAndConnect(Window *win)
