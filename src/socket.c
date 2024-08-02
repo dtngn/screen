@@ -831,7 +831,10 @@ void ReceiveMsg(void)
 	case MSG_ATTACH:
 		if (CreateTempDisplay(&m, recvfd, win))
 			break;
-		AskPassword(&m);
+		if (do_auth)
+			AskPassword(&m);
+		else
+			FinishAttach(&m);
 		break;
 	case MSG_ERROR:
 		{
@@ -850,7 +853,10 @@ void ReceiveMsg(void)
 	case MSG_POW_DETACH:
 		if (CreateTempDisplay(&m, recvfd, NULL))
 			break;
-		AskPassword(&m);
+		if (do_auth)
+			AskPassword(&m);
+		else
+			FinishAttach(&m);
 		break;
 	case MSG_QUERY:
 		{
