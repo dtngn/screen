@@ -48,10 +48,10 @@
 
 /* escape characters (alphabetical order) */
 typedef enum {
-	WINESC_TIME            = 'C',
-	WINESC_time            = 'c',
 	WINESC_HOUR            = 'A',
 	WINESC_hour            = 'a',
+	WINESC_TIME            = 'C',
+	WINESC_time            = 'c',
 	WINESC_DAY             = 'D',
 	WINESC_day             = 'd',
 	WINESC_ESC_SEEN        = 'E',
